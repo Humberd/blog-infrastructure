@@ -79,11 +79,6 @@ resource "helm_release" "elasticsearch" {
     name = "replicas"
     value = 1
   }
-
-  set {
-    name = "nodeSelector"
-    value = "app: elasticsearch"
-  }
 }
 
 //resource "kubernetes_deployment" "blog-backend" {
