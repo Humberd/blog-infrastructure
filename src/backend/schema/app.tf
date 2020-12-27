@@ -36,6 +36,10 @@ resource "digitalocean_kubernetes_cluster" "blog-dev" {
     name = "worker-pool"
     size = "s-1vcpu-2gb"
     node_count = 1
+
+    labels = {
+      type = "casual_worker"
+    }
   }
 }
 
@@ -50,6 +54,7 @@ resource "digitalocean_kubernetes_node_pool" "blog-dev-elasticsearch-nodes" {
   }
 }
 
+# Binding resources to a newly created project
 resource "digitalocean_project_resources" "blog-dev-resources" {
   project = digitalocean_project.blog-dev.id
   resources = ["do:kubernetes:${digitalocean_kubernetes_cluster.blog-dev.id}"]
@@ -75,40 +80,45 @@ resource "helm_release" "elasticsearch" {
   chart = "elasticsearch"
   name = "elasticsearch"
 
-  set {
-    name = "replicas"
-    value = 1
-  }
+  values = [
+    templatefile("${path.module}/templates/elasticsearch-values.yaml", {
+      es_ingress_enabled = true
+      es_host = "elasticsearch.foobar"
+    })
+  ]
 }
 
-//resource "kubernetes_deployment" "blog-backend" {
-//  metadata {
-//    name = "blog-backend-deployment"
-//    labels = {
-//      app = "kotlin-spring"
-//    }
-//  }
-//  spec {
-//    selector {
-//      match_labels = {
-//        app = "kotlin-spring"
-//      }
-//    }
-//    template {
-//      metadata {
-//        labels = {
-//          app = "kotlin-spring"
-//        }
-//      }
-//      spec {
-//        container {
-//          image = "humberd/blog-backend:1"
-//          name = "kotlin-spring"
-//          port {
-//            container_port = 8080
-//          }
-//        }
-//      }
-//    }
-//  }
-//}
+resource "kubernetes_deployment" "blog-backend" {
+  metadata {
+    name = "blog-backend-deployment"
+    labels = {
+      app = "blog-backend"
+    }
+  }
+  spec {
+    selector {
+      match_labels = {
+        app = "blog-backend"
+      }
+    }
+    template {
+      metadata {
+        labels = {
+          app = "blog-backend"
+        }
+      }
+      spec {
+        node_selector = {
+          type = "casual_worker"
+        }
+        container {
+          image = "humberd/blog-backend:2"
+          name = "kotlin-spring"
+          port {
+            container_port = 8080
+          }
+        }
+      }
+    }
+  }
+}

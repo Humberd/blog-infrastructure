@@ -1,0 +1,31 @@
+# https://github.com/christophefromparis/plf_k8s_monitoring_module/blob/436e88007d/elastic.tf
+# https://github.com/elastic/helm-charts/blob/master/elasticsearch/values.yaml
+---
+clusterName: "elasticsearch"
+nodeGroup: "master"
+
+# Elasticsearch roles that will be applied to this nodeGroup
+roles:
+  master: "true"
+  ingest: "true"
+  data: "true"
+
+replicas: 1
+
+nodeSelector:
+  app: elasticsearch
+
+# Enabling this will publicly expose your Elasticsearch instance.
+# Only enable this if you have security enabled on your cluster
+ingress:
+  enabled: ${es_ingress_enabled}
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    kubernetes.io/tls-acme: "true"
+  path: /
+  hosts:
+    - ${es_host}
+  tls:
+    - secretName: elasticsearch-tls
+      hosts:
+        - ${es_host}
