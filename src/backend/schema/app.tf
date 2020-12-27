@@ -1,3 +1,7 @@
+locals {
+  region = "fra1"
+}
+
 terraform {
   required_providers {
     digitalocean = {
@@ -15,4 +19,15 @@ resource "digitalocean_project" "blog-dev" {
   name = "blog-dev"
   description = "msawicki.dev blog - DEV"
   environment = "Development"
+}
+
+resource "digitalocean_kubernetes_cluster" "blog-dev" {
+  name = "blog-dev"
+  region = local.region
+  version = "1.19.3-do.2"
+  node_pool {
+    name = "worker-pool"
+    size = "s-1vcpu-2gb"
+    node_count = 2
+  }
 }
