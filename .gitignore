@@ -1,3 +1,7 @@
 .idea
 *.iml
-src/grafana-storage
+terraform.tfvars
+.terraform
+.terraform.lock.hcl
+terraform.tfstate
+.terraform.tfstate.lock.info
