@@ -122,3 +122,24 @@ resource "kubernetes_deployment" "blog-backend" {
     }
   }
 }
+
+resource "kubernetes_service" "blog-backend" {
+  metadata {
+    name = "blog-backend-service"
+    labels = {
+      app = "blog-backend"
+    }
+  }
+  spec {
+    selector = {
+      app = "blog-backend"
+    }
+
+    port {
+      port = 8080
+      target_port = 8080
+    }
+
+    type = "LoadBalancer"
+  }
+}
