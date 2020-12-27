@@ -131,6 +131,34 @@ resource "kubernetes_service" "blog-backend" {
     }
   }
   spec {
+    type = "NodePort"
+
+    selector = {
+      app = "blog-backend"
+    }
+
+    port {
+      node_port = 32100
+      port = 8080
+      target_port = 8080
+    }
+  }
+}
+
+resource "kubernetes_service" "blog-backend-lb" {
+  metadata {
+    name = "blog-backend-lb"
+    labels = {
+      app = "blog-backend"
+    }
+    annotations = {
+      "service.beta.kubernetes.io/do-loadbalancer-name" = "blog.mydomain.com"
+      "service.beta.kubernetes.io/do-loadbalancer-hostname" = "blog.mydomain.com"
+    }
+  }
+  spec {
+    type = "LoadBalancer"
+
     selector = {
       app = "blog-backend"
     }
@@ -139,7 +167,32 @@ resource "kubernetes_service" "blog-backend" {
       port = 8080
       target_port = 8080
     }
-
-    type = "LoadBalancer"
   }
+}
+
+//resource "kubernetes_ingress" "blog-backend" {
+//  metadata {
+//    name = "blog-backend-ingress"
+//    annotations = {
+//      "kubernetes.io/ingress.class" = "nginx"
+//    }
+//  }
+//  spec {
+//    rule {
+//      host = "do.humberd.pl"
+//      http {
+//        path {
+//          backend {
+//            service_name = "blog-backend-service"
+//            service_port = 8080
+//          }
+//          path = "/"
+//        }
+//      }
+//    }
+//  }
+//}
+
+resource "digitalocean_domain" "blog-backend-domain" {
+  name = "blog.do.humberd.pl"
 }
