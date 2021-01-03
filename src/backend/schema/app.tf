@@ -210,10 +210,10 @@ resource "digitalocean_domain" "blog-backend-domain" {
   name = "blog.do.humberd.pl"
 }
 //
-//resource "digitalocean_project_resources" "domain-attachment" {
-//  project = digitalocean_project.blog-dev.id
-//  resources = ["do:domain:${digitalocean_domain.blog-backend-domain.id}"]
-//}
+resource "digitalocean_project_resources" "domain-attachment" {
+  project = digitalocean_project.blog-dev.id
+  resources = ["do:domain:${digitalocean_domain.blog-backend-domain.id}"]
+}
 //
 //resource "digitalocean_record" "backend" {
 //  domain = digitalocean_domain.blog-backend-domain.name
