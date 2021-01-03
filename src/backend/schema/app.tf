@@ -209,6 +209,13 @@ resource "kubernetes_ingress" "blog-backend-ingress" {
 resource "digitalocean_domain" "blog-backend-domain" {
   name = "blog.do.humberd.pl"
 }
+
+resource "digitalocean_record" "backend-api" {
+  domain = digitalocean_domain.blog-backend-domain.name
+  name = "@"
+  type = "A"
+  value = kubernetes_ingress.blog-backend-ingress.load_balancer_ingress[0].ip
+}
 //
 resource "digitalocean_project_resources" "domain-attachment" {
   project = digitalocean_project.blog-dev.id
