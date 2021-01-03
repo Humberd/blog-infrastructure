@@ -152,8 +152,8 @@ resource "kubernetes_service" "blog-backend-lb" {
       app = "blog-backend"
     }
     annotations = {
-      "service.beta.kubernetes.io/do-loadbalancer-name" = "blog.mydomain.com"
-      "service.beta.kubernetes.io/do-loadbalancer-hostname" = "blog.mydomain.com"
+      "service.beta.kubernetes.io/do-loadbalancer-name" = "blog.do.humberd.pl"
+      "service.beta.kubernetes.io/do-loadbalancer-hostname" = "blog.do.humberd.pl"
     }
   }
   spec {
@@ -164,7 +164,7 @@ resource "kubernetes_service" "blog-backend-lb" {
     }
 
     port {
-      port = 8080
+      port = 80
       target_port = 8080
     }
   }
@@ -196,3 +196,23 @@ resource "kubernetes_service" "blog-backend-lb" {
 resource "digitalocean_domain" "blog-backend-domain" {
   name = "blog.do.humberd.pl"
 }
+//
+//resource "digitalocean_project_resources" "domain-attachment" {
+//  project = digitalocean_project.blog-dev.id
+//  resources = ["do:domain:${digitalocean_domain.blog-backend-domain.id}"]
+//}
+//
+//resource "digitalocean_record" "backend" {
+//  domain = digitalocean_domain.blog-backend-domain.name
+//  name = "@"
+//  type = "A"
+//  value = terr
+//}
+
+//output "node_ip" {
+//  value = kubernetes_service.blog-backend
+//}
+//
+//output "load_balancer_ip" {
+//  value = kubernetes_service.blog-backend-lb
+//}
