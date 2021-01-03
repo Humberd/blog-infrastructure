@@ -6,3 +6,4 @@ terraform.tfvars
 terraform.tfstate
 .terraform.tfstate.lock.info
 terraform.tfstate.backup
+blog-dev-kubeconfig.yaml

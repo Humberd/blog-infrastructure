@@ -35,7 +35,7 @@ resource "digitalocean_kubernetes_cluster" "blog-dev" {
   node_pool {
     name = "worker-pool"
     size = "s-1vcpu-2gb"
-    node_count = 1
+    node_count = 3
 
     labels = {
       type = "casual_worker"
@@ -96,6 +96,8 @@ resource "kubernetes_deployment" "blog-backend" {
     }
   }
   spec {
+    replicas = 3
+
     selector {
       match_labels = {
         app = "blog-backend"
@@ -112,10 +114,15 @@ resource "kubernetes_deployment" "blog-backend" {
           type = "casual_worker"
         }
         container {
-          image = "humberd/blog-backend:2"
+          image = "humberd/blog-backend:3"
           name = "kotlin-spring"
           port {
             container_port = 8080
+          }
+
+          env {
+            name = "elasticsearch.url"
+            value = "${helm_release.elasticsearch.name}-master:9200"
           }
         }
       }
@@ -179,7 +186,7 @@ resource "kubernetes_service" "blog-backend-lb" {
 //  }
 //  spec {
 //    rule {
-//      host = "do.humberd.pl"
+//      host = "blog.do.humberd.pl"
 //      http {
 //        path {
 //          backend {
