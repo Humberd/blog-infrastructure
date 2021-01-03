@@ -138,68 +138,67 @@ resource "kubernetes_service" "blog-backend" {
     }
   }
   spec {
-    type = "NodePort"
+    type = "ClusterIP"
 
     selector = {
       app = "blog-backend"
     }
 
     port {
-      node_port = 32100
       port = 8080
       target_port = 8080
     }
   }
 }
 
-resource "kubernetes_service" "blog-backend-lb" {
-  metadata {
-    name = "blog-backend-lb"
-    labels = {
-      app = "blog-backend"
-    }
-    annotations = {
-      "service.beta.kubernetes.io/do-loadbalancer-name" = "blog.do.humberd.pl"
-      "service.beta.kubernetes.io/do-loadbalancer-hostname" = "blog.do.humberd.pl"
-    }
-  }
-  spec {
-    type = "LoadBalancer"
-
-    selector = {
-      app = "blog-backend"
-    }
-
-    port {
-      name = "public"
-      port = 80
-      target_port = 8080
-    }
-  }
-}
-
-//resource "kubernetes_ingress" "blog-backend" {
+//resource "kubernetes_service" "blog-backend-lb" {
 //  metadata {
-//    name = "blog-backend-ingress"
+//    name = "blog-backend-lb"
+//    labels = {
+//      app = "blog-backend"
+//    }
 //    annotations = {
-//      "kubernetes.io/ingress.class" = "nginx"
+//      "service.beta.kubernetes.io/do-loadbalancer-name" = "blog.do.humberd.pl"
+//      "service.beta.kubernetes.io/do-loadbalancer-hostname" = "blog.do.humberd.pl"
 //    }
 //  }
 //  spec {
-//    rule {
-//      host = "blog.do.humberd.pl"
-//      http {
-//        path {
-//          backend {
-//            service_name = "blog-backend-service"
-//            service_port = 8080
-//          }
-//          path = "/"
-//        }
-//      }
+//    type = "LoadBalancer"
+//
+//    selector = {
+//      app = "blog-backend"
+//    }
+//
+//    port {
+//      name = "public"
+//      port = 80
+//      target_port = 8080
 //    }
 //  }
 //}
+
+resource "kubernetes_ingress" "blog-backend-ingress" {
+  metadata {
+    name = "blog-backend-ingress"
+    annotations = {
+      "kubernetes.io/ingress.class" = "nginx"
+    }
+  }
+  spec {
+    rule {
+      host = "blog.do.humberd.pl"
+      http {
+        path {
+          backend {
+            service_name = "blog-backend-service"
+            service_port = 8080
+          }
+          path = "/"
+        }
+      }
+    }
+  }
+}
 
 resource "digitalocean_domain" "blog-backend-domain" {
   name = "blog.do.humberd.pl"
