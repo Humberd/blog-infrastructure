@@ -171,6 +171,7 @@ resource "kubernetes_service" "blog-backend-lb" {
     }
 
     port {
+      name = "public"
       port = 80
       target_port = 8080
     }
