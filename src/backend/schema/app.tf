@@ -184,6 +184,7 @@ resource "helm_release" "ingress-nginx" {
 }
 
 resource "kubernetes_ingress" "blog-backend-ingress" {
+  wait_for_load_balancer = true
   metadata {
     name = "blog-backend-ingress"
     annotations = {
