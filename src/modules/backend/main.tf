@@ -76,7 +76,7 @@ resource "kubernetes_ingress" "blog-backend-ingress" {
 
   spec {
     rule {
-      host = "blog.do.humberd.pl"
+      host = var.api_domain
       http {
         path {
           backend {

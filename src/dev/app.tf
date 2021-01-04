@@ -101,6 +101,7 @@ module "backend" {
   source = "../modules/backend"
 
   elasticsearch_url = module.elasticsearch.master_node_ip
+  api_domain = "${local.api_subdomain}.${var.base_domain}"
 }
 
 resource "digitalocean_record" "backend-api" {
