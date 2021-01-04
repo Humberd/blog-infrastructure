@@ -94,11 +94,11 @@ resource "digitalocean_project_resources" "domain-attachment" {
 
 ######### APP MODULES #########
 module "elasticsearch" {
-  source = "../../modules/elasticsearch"
+  source = "../modules/elasticsearch"
 }
 
 module "backend" {
-  source = "../../modules/backend"
+  source = "../modules/backend"
 
   elasticsearch_url = module.elasticsearch.master_node_ip
 }
