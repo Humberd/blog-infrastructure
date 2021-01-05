@@ -5,13 +5,18 @@ locals {
 terraform {
   required_providers {
     digitalocean = {
-      source  = "digitalocean/digitalocean"
+      source = "digitalocean/digitalocean"
       version = "2.3.0"
     }
 
     helm = {
-      source  = "hashicorp/helm"
+      source = "hashicorp/helm"
       version = "2.0.1"
+    }
+
+    kubectl = {
+      source = "gavinbunney/kubectl"
+      version = "1.9.4"
     }
   }
 }
@@ -21,36 +26,36 @@ provider "digitalocean" {
 }
 
 provider "kubernetes" {
-  load_config_file       = false
-  host                   = digitalocean_kubernetes_cluster.k8s_cluster.endpoint
-  token                  = digitalocean_kubernetes_cluster.k8s_cluster.kube_config[0].token
+  load_config_file = false
+  host = digitalocean_kubernetes_cluster.k8s_cluster.endpoint
+  token = digitalocean_kubernetes_cluster.k8s_cluster.kube_config[0].token
   cluster_ca_certificate = base64decode(digitalocean_kubernetes_cluster.k8s_cluster.kube_config[0].cluster_ca_certificate)
 }
 
 provider "helm" {
   kubernetes {
-    host                   = digitalocean_kubernetes_cluster.k8s_cluster.endpoint
-    token                  = digitalocean_kubernetes_cluster.k8s_cluster.kube_config[0].token
+    host = digitalocean_kubernetes_cluster.k8s_cluster.endpoint
+    token = digitalocean_kubernetes_cluster.k8s_cluster.kube_config[0].token
     cluster_ca_certificate = base64decode(digitalocean_kubernetes_cluster.k8s_cluster.kube_config[0].cluster_ca_certificate)
   }
 }
 
 ######### DIGITAL OCEAN RESOURCES #########
 resource "digitalocean_project" "project" {
-  name        = "blog-dev"
+  name = "blog-dev"
   description = "msawicki.dev blog - DEV"
   environment = "Development"
 }
 
 resource "digitalocean_kubernetes_cluster" "k8s_cluster" {
-  name    = "blog-dev"
-  region  = var.do_region
+  name = "blog-dev"
+  region = var.do_region
   version = "1.19.3-do.2"
-  tags    = ["dev"]
+  tags = ["dev"]
 
   node_pool {
-    name       = "worker-pool"
-    size       = "s-1vcpu-2gb"
+    name = "worker-pool"
+    size = "s-1vcpu-2gb"
     node_count = 3
 
     labels = {
@@ -61,8 +66,8 @@ resource "digitalocean_kubernetes_cluster" "k8s_cluster" {
 
 resource "digitalocean_kubernetes_node_pool" "k8s_cluster_nodes--elasticsearch" {
   cluster_id = digitalocean_kubernetes_cluster.k8s_cluster.id
-  name       = "elasticsearch-pool"
-  size       = "s-2vcpu-4gb"
+  name = "elasticsearch-pool"
+  size = "s-2vcpu-4gb"
   node_count = 1
 
   labels = {
@@ -72,15 +77,15 @@ resource "digitalocean_kubernetes_node_pool" "k8s_cluster_nodes--elasticsearch" 
 
 # Binding resources to a newly created project
 resource "digitalocean_project_resources" "blog-dev-resources" {
-  project   = digitalocean_project.project.id
+  project = digitalocean_project.project.id
   resources = ["do:kubernetes:${digitalocean_kubernetes_cluster.k8s_cluster.id}"]
 }
 
 ######### DOMAIN STUFF #########
 resource "helm_release" "ingress-nginx" {
   repository = "https://kubernetes.github.io/ingress-nginx"
-  chart      = "ingress-nginx"
-  name       = "ingress-nginx"
+  chart = "ingress-nginx"
+  name = "ingress-nginx"
 }
 
 resource "digitalocean_domain" "domain" {
@@ -88,7 +93,7 @@ resource "digitalocean_domain" "domain" {
 }
 
 resource "digitalocean_project_resources" "domain-attachment" {
-  project   = digitalocean_project.project.id
+  project = digitalocean_project.project.id
   resources = ["do:domain:${digitalocean_domain.domain.id}"]
 }
 
@@ -106,7 +111,7 @@ module "backend" {
 
 resource "digitalocean_record" "backend-api" {
   domain = digitalocean_domain.domain.name
-  name   = local.api_subdomain
-  type   = "A"
-  value  = module.backend.public_ip
+  name = local.api_subdomain
+  type = "A"
+  value = module.backend.public_ip
 }
