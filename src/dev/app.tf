@@ -32,6 +32,13 @@ provider "kubernetes" {
   cluster_ca_certificate = base64decode(digitalocean_kubernetes_cluster.k8s_cluster.kube_config[0].cluster_ca_certificate)
 }
 
+provider "kubectl" {
+  load_config_file = false
+  host = digitalocean_kubernetes_cluster.k8s_cluster.endpoint
+  token = digitalocean_kubernetes_cluster.k8s_cluster.kube_config[0].token
+  cluster_ca_certificate = base64decode(digitalocean_kubernetes_cluster.k8s_cluster.kube_config[0].cluster_ca_certificate)
+}
+
 provider "helm" {
   kubernetes {
     host = digitalocean_kubernetes_cluster.k8s_cluster.endpoint
@@ -102,11 +109,18 @@ module "elasticsearch" {
   source = "../modules/elasticsearch"
 }
 
+module "cert-manager" {
+  source = "../modules/cert-manager"
+
+  email = var.cert_mail
+}
+
 module "backend" {
   source = "../modules/backend"
 
   elasticsearch_url = module.elasticsearch.master_node_ip
   api_domain = "${local.api_subdomain}.${var.base_domain}"
+  cert_cluster_issuer_name = module.cert-manager.cert_cluster_issuer_name
 }
 
 resource "digitalocean_record" "backend-api" {

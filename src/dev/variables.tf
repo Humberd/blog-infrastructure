@@ -10,3 +10,7 @@ variable "do_region" {
 variable "base_domain" {
   type = string
 }
+
+variable "cert_mail" {
+  type = string
+}

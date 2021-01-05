@@ -71,10 +71,16 @@ resource "kubernetes_ingress" "blog-backend-ingress" {
     name = "blog-backend-ingress"
     annotations = {
       "kubernetes.io/ingress.class" = "nginx"
+      "cert-manager.io/cluster-issuer" = var.cert_cluster_issuer_name
     }
   }
 
   spec {
+    tls {
+      hosts = [var.api_domain]
+      secret_name = "backend_secret_tls"
+    }
+
     rule {
       host = var.api_domain
       http {
