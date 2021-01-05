@@ -71,6 +71,7 @@ resource "kubernetes_ingress" "blog-backend-ingress" {
     name = "blog-backend-ingress"
     annotations = {
       "kubernetes.io/ingress.class" = "nginx"
+      "kubernetes.io/tls-acme": true
       "cert-manager.io/cluster-issuer" = var.cert_cluster_issuer_name
     }
   }
