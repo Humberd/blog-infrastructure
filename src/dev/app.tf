@@ -116,12 +116,14 @@ module "elasticsearch" {
 }
 
 module "cert-manager" {
+  depends_on = [helm_release.ingress-nginx]
   source = "../modules/cert-manager"
 
   email = var.cert_mail
 }
 
 module "backend" {
+  depends_on = [helm_release.ingress-nginx]
   source = "../modules/backend"
 
   elasticsearch_url = module.elasticsearch.master_node_ip
