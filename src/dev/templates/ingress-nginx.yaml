@@ -1,0 +1,5 @@
+controller:
+  service:
+    annotations:
+      service.beta.kubernetes.io/do-loadbalancer-hostname: ${base_domain}
+      service.beta.kubernetes.io/do-loadbalancer-name: ${base_domain}

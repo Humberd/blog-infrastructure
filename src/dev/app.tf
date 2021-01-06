@@ -63,7 +63,7 @@ resource "digitalocean_kubernetes_cluster" "k8s_cluster" {
   node_pool {
     name = "worker-pool"
     size = "s-1vcpu-2gb"
-    node_count = 3
+    node_count = 1
 
     labels = {
       type = "casual_worker"
@@ -93,6 +93,12 @@ resource "helm_release" "ingress-nginx" {
   repository = "https://kubernetes.github.io/ingress-nginx"
   chart = "ingress-nginx"
   name = "ingress-nginx"
+
+  values = [
+    templatefile("${path.module}/templates/ingress-nginx.yaml", {
+      base_domain = var.base_domain
+    })
+  ]
 }
 
 resource "digitalocean_domain" "domain" {
